@@ -4,14 +4,17 @@ import tempfile
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-
+import configparser
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, AudioMessage,ImageMessage, VideoMessage
 
 app = Flask(__name__)
 
 # LINE 聊天機器人的基本資料
-line_bot_api = LineBotApi()
-handler = WebhookHandler()
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
+handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
 
 
 # 接收 LINE 的資訊
