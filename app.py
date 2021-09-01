@@ -10,8 +10,8 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage, AudioMess
 app = Flask(__name__)
 
 # LINE 聊天機器人的基本資料
-line_bot_api = LineBotApi('i0LQsDBaLOGXnGc6J1sXydMVKbQqpl5OgKIR5hVY0LzVdhC8tPJtxSfjjFaTqnlNGzWhnCl+Uy54QkyGjYDSj6v1ea8u1DAJM0+9oBITsGS4OED/MH+K5+SZ1x9NQgEt1cf7ZgC9f3PFbstoiVF8vAdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('95b8853cc3384a8514f1522ba9c76822')
+line_bot_api = LineBotApi()
+handler = WebhookHandler()
 
 
 # 接收 LINE 的資訊
