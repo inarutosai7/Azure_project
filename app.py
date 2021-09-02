@@ -13,6 +13,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 
+
 app = Flask(__name__)
 
 #  Initial Azure configure
@@ -21,7 +22,6 @@ service_region = config.get('azure_cognitive', 'service_region')
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 
 # LINE 聊天機器人的基本資料
-
 
 line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
 handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
@@ -66,12 +66,14 @@ def handle_content_message(event):
     with open(path , 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
+
     print(a.Azure_cognictive(path,event))
     rply_text = '已存入{}'.format(a.Azure_cognictive(path,event))
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=rply_text)
     )
+
 
 
 if __name__ == "__main__":
