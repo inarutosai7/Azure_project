@@ -3,12 +3,15 @@
 import mySQL_Config
 # import python  my SQL packages
 import pymysql
-from random import random
+import  random
+import  re
+
+
 
 global connSQL, cursor, usrInput, idNO, cusNO, usrName, Budget, cost, SpendDateTime, Catalog
 
 # Initial MySQL
-def MySQL_Connect():
+def Connect():
     # 建立連線
     print('Connect to SQL')
     # get MySQL Connect
@@ -16,11 +19,11 @@ def MySQL_Connect():
     cursor = connSQL.cursor()
     print('Successfully Connected!')
 
-def MySQL_DisConnect():
+def DisConnect():
     print('Close Connection MySQL')
     connSQL.close()
 
-def MySQL_InsertData(idNO, cusNO, usrName, Budget, cost, SpendDateTime, Catalog):
+def InsertData(idNO, cusNO, usrName, Budget, cost, SpendDateTime, Catalog):
 
     sql ="""INSERT INTO userdata (INDEXNO, CUSTOMERNO, CNAME, MAXLIMIT, COST, DATATIME,CATEGORY)
             VALUES ('04','01' ,'JOHN', '3000', '45','2020-04-24 14:59:57',' ');
@@ -29,4 +32,9 @@ def MySQL_InsertData(idNO, cusNO, usrName, Budget, cost, SpendDateTime, Catalog)
 
 
 def GrabResultTxt(Resultxt):
-    pass
+    print('extract Cost numbers  from string')
+    cost = re.findall(r'\b\d+\b', Resultxt)
+    print('you spend:  \n ',cost)
+
+
+    # pass

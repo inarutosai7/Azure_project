@@ -1,11 +1,16 @@
 from __future__ import unicode_literals
-from random import random
+# import correct random packages
+import random
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 import configparser
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, AudioMessage,ImageMessage, VideoMessage
+# Audio Message Process packages
 import AzurelBotAudioHandler
+# MySQL  Processs packages
+import MySQLHandler
+import  re
 
 #Flask root
 app = Flask(__name__) # creates the Flask instance.
@@ -35,7 +40,7 @@ def callback():
         abort(400)
     return 'OK'
 
-# 學你說話 Text Memo
+# 學你說話 Text Memo Echo
 @handler.add(MessageEvent, message=TextMessage)
 def pretty_echo(event):
     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
@@ -64,12 +69,16 @@ def handle_content_message(event):
     with open(path , 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
-    # Check Audio Message
-    BotResponse = AzurelBotAudioHandler.LineBotAudioConvert2AzureAudio(path)
-    print('User Input = \n',BotResponse)
+    # Check & Convert Audio Message to Azure
+    # BotResponses  =  AzurelBotAudioHandler.LineBotAudioConvert2AzureAudio(path) # this is old one
+    BotResponses = AzurelBotAudioHandler.LineBotAudioDirect2Wav(path) # this is new one
+    # cost = re.finall(r'\d+', BotResponses)
+    # print('your cost = \n',cost)
+    print('User Input = \n',BotResponses)
+    MySQLHandler.GrabResultTxt(BotResponses)
 
 
 if __name__ == "__main__":
-
+    # MySQLHandler.GrabResultTxt('拉麵，600元。')
     # MySQL_DisConnect()
-    app.run(debug = True )
+    app.run(debug = True , port = 3000)
