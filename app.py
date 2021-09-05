@@ -1,9 +1,14 @@
 from __future__ import unicode_literals
+# import correct random packages
+import random
 import pymysql
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 import configparser
+# Audio Message Process packages
+import AzurelBotAudioHandler
+# MySQL  Processs packages
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, AudioMessage, ImageMessage, ImageSendMessage
 from pydub import AudioSegment
 import azure.cognitiveservices.speech as speechsdk
@@ -22,6 +27,8 @@ speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_r
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+# LINE 聊天機器人的基本資料
+print(config)
 line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
 handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
 
@@ -50,6 +57,7 @@ def callback():
     return 'OK'
 
 
+
 # set user basic Info
 @handler.add(MessageEvent, message=TextMessage)
 def getUserInfo(event):
@@ -74,7 +82,7 @@ def getUserInfo(event):
             event.reply_token,
             TextSendMessage(text='本月預算= ' + str(MAXLIMIT))
         )
-
+    
     elif '清空' in event.message.text:
         conn = pymysql.connect(**loginInfo)
         cursor = conn.cursor()
@@ -92,7 +100,6 @@ def getUserInfo(event):
             TextSendMessage("請輸入「預算」+「數字」" + '\n' + 'ex: 預算30000' + '\n' '輸入「清空」可重置')
         )
 
-
 @handler.add(MessageEvent, message=AudioMessage)
 def handle_content_message(event):
     user_id = event.source.user_id
@@ -105,24 +112,17 @@ def handle_content_message(event):
         for chunk in message_content.iter_content():
             fd.write(chunk)
 
-    usraudio = AudioSegment.from_file_using_temporary_files(path)
-    new_path = 'static/{}.wav'.format(event.message.id)
-    usraudio.export(new_path, format="wav")
-
-    audio_filename = new_path
-    audio_input = speechsdk.audio.AudioConfig(filename=audio_filename)
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, language="zh-TW",
-                                                   audio_config=audio_input)
-
-    Azure_result = speech_recognizer.recognize_once()
-    print(Azure_result.text)
+    # Check & Convert Audio Message to Azure
+    # BotResponses  =  AzurelBotAudioHandler.LineBotAudioConvert2AzureAudio(path) # this is old one
+    BotResponses = AzurelBotAudioHandler.LineBotAudioDirect2Wav(path) # this is new one
+    print(BotResponses)
 
     # read jieba dict for classify
     # jieba.load_userdict('./jieba_dict.txt')
     with open('./jieba_dict_food.txt', 'r', encoding="utf-8") as f:
         food_class = f.read(-1)
 
-    rawData = Azure_result.text
+    rawData = BotResponses
     tmp_dict = dict()
 
     # get foodCost_sum & otherCost_sum
