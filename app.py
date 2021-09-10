@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+# import correct random packages
+import random
 import pymysql
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -23,6 +25,8 @@ speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_r
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+# LINE 聊天機器人的基本資料
+print(config)
 line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
 handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
 
@@ -49,6 +53,7 @@ def callback():
         abort(400)
     return 'OK'
 
+
 # set user basic Info
 @handler.add(MessageEvent, message=TextMessage)
 def getUserInfo(event):
@@ -73,7 +78,7 @@ def getUserInfo(event):
             event.reply_token,
             TextSendMessage(text='本月預算= ' + str(MAXLIMIT))
         )
-
+    
     elif '清空' in event.message.text:
         conn = pymysql.connect(**loginInfo)
         cursor = conn.cursor()
@@ -144,6 +149,7 @@ def handle_content_message(event):
     with open(path, 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
+
 
     usraudio = AudioSegment.from_file_using_temporary_files(path)
     new_path = 'static/{}.wav'.format(event.message.id)
